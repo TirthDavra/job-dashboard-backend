@@ -20,6 +20,7 @@ export const register = async (
     res: Response
 ) => {
     const { name, email, password, role } = req.body;
+    console.log(name, email, password, role);
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
