@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import mongoose from "mongoose";
 import type { AuthRequest } from "../common/middleware/auth.middleware";
 import Job from "../model/job.model";
 import type { z } from "zod";
@@ -147,6 +148,68 @@ export const getRecruiterJobs = async (req: AuthRequest, res: Response) => {
             total,
             totalPages,
         });
+    } catch {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+/** Express 5 types params as string | string[] */
+function routeParam(v: string | string[] | undefined): string {
+    if (v == null) return "";
+    return Array.isArray(v) ? v[0] ?? "" : v;
+}
+
+export const closeJob = async (req: AuthRequest, res: Response) => {
+    try {
+        const jobId = routeParam(req.params.jobId);
+        if (!mongoose.Types.ObjectId.isValid(jobId)) {
+            return res.status(400).json({ message: "Invalid job id" });
+        }
+
+        const job = await Job.findById(jobId);
+        if (!job) {
+            return res.status(404).json({ message: "Job not found" });
+        }
+
+        if (String(job.recruiterId) !== req.user!.id) {
+            return res.status(403).json({ message: "Forbidden" });
+        }
+
+        if (!job.isOpen) {
+            return res.status(400).json({ message: "Job is already closed" });
+        }
+
+        job.isOpen = false;
+        await job.save();
+
+        return res.status(200).json({
+            message: "Job closed successfully",
+            job,
+        });
+    } catch {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const deleteJob = async (req: AuthRequest, res: Response) => {
+    try {
+        const jobId = routeParam(req.params.jobId);
+        if (!mongoose.Types.ObjectId.isValid(jobId)) {
+            return res.status(400).json({ message: "Invalid job id" });
+        }
+
+        const job = await Job.findById(jobId).lean();
+        if (!job) {
+            return res.status(404).json({ message: "Job not found" });
+        }
+
+        if (String(job.recruiterId) !== req.user!.id) {
+            return res.status(403).json({ message: "Forbidden" });
+        }
+
+        await Job.findByIdAndDelete(jobId);
+
+        return res.status(200).json({ message: "Job deleted successfully" });
     } catch {
         return res.status(500).json({ message: "Internal server error" });
     }

@@ -3,6 +3,8 @@ import {
     createJob,
     getAllJobs,
     getRecruiterJobs,
+    closeJob,
+    deleteJob,
 } from "../controller/job.controller";
 import { getApplicationsForJob } from "../controller/application.controller";
 import { validate } from "../common/middleware/validate";
@@ -23,6 +25,18 @@ router.get(
     protect,
     authorize(["recruiter"]),
     getApplicationsForJob
+);
+router.patch(
+    "/:jobId/close",
+    protect,
+    authorize(["recruiter"]),
+    closeJob
+);
+router.delete(
+    "/:jobId",
+    protect,
+    authorize(["recruiter"]),
+    deleteJob
 );
 router.get("/", getAllJobs);
 router.post(
