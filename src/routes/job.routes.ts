@@ -4,6 +4,7 @@ import {
     getAllJobs,
     getRecruiterJobs,
 } from "../controller/job.controller";
+import { getApplicationsForJob } from "../controller/application.controller";
 import { validate } from "../common/middleware/validate";
 import { createJobSchema } from "../validations/job.validation";
 import { protect } from "../common/middleware/auth.middleware";
@@ -16,6 +17,12 @@ router.get(
     protect,
     authorize(["recruiter"]),
     getRecruiterJobs
+);
+router.get(
+    "/:jobId/applications",
+    protect,
+    authorize(["recruiter"]),
+    getApplicationsForJob
 );
 router.get("/", getAllJobs);
 router.post(

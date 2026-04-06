@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes";
 import jobRoutes from "./routes/job.routes";
 import profileRoutes from "./routes/profile.routes";
 import applicationRoutes from "./routes/application.routes";
+import recruiterRoutes from "./routes/recruiter.routes";
 import { ensureAdminUser } from "./seed/ensureAdminUser";
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/applications", applicationRoutes);
+app.use("/api/recruiter", recruiterRoutes);
 
 async function bootstrap() {
   await connectDB();

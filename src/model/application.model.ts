@@ -1,8 +1,21 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+export const APPLICATION_STATUSES = [
+    "applied",
+    "shortlisted",
+    "interviewed",
+    "rejected",
+    "hired",
+] as const;
+
+export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
+
 export interface IApplication extends Document {
     candidateId: mongoose.Types.ObjectId;
     jobId: mongoose.Types.ObjectId;
+    status: ApplicationStatus;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 const ApplicationSchema = new Schema<IApplication>(
@@ -16,6 +29,11 @@ const ApplicationSchema = new Schema<IApplication>(
             type: Schema.Types.ObjectId,
             ref: "Job",
             required: true,
+        },
+        status: {
+            type: String,
+            enum: APPLICATION_STATUSES,
+            default: "applied",
         },
     },
     { timestamps: true }
